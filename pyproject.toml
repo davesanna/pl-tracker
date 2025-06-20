@@ -24,5 +24,6 @@ dependencies = [
     "python-multipart>=0.0.20",
     "streamlit==1.46.0",
     "streamlit-auth0>=1.0.5",
+    "streamlit-pdf-viewer>=0.0.25",
     "supabase>=2.15.3",
 ]
