@@ -19,7 +19,6 @@ from src.pl_tracker.plots import (
 )
 
 st.header("Nutrition")
-st.markdown("This page is under construction. Please check back later for updates.")
 
 
 col1, col2 = st.columns(2)
