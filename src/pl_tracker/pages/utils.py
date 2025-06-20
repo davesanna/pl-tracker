@@ -27,8 +27,8 @@ def common_nav():
                 if user["name"] == username
             ][0]
 
-    if not st.user["email_verified"]:
-        st.warning("Please verify your email and login back to unlock all features")
+    # if not st.user["email_verified"]:
+    #     st.warning("Please verify your email and login back to unlock all features")
 
     with st.sidebar:
 
