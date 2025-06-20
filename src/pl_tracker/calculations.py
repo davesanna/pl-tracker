@@ -95,6 +95,7 @@ def get_last_7d_avg_calories_target(
         .head(7)[["Target Calories (kcal)"]]
         .reset_index(drop=True)
         .mean()
+        .round(0)
     )
 
     return last_7d_avg_caloric_target
