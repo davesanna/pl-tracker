@@ -6,6 +6,7 @@ import requests
 
 from src.pl_tracker.database import SupabaseClient
 from src.pl_tracker.plots import plot_1rm_progress, plot_sets_per_week
+import streamlit.components.v1 as components
 
 
 st.header("Programs")
@@ -86,10 +87,11 @@ else:
 
             base64_pdf = base64.b64encode(response.content).decode("utf-8")
 
+            # Embed the signed URL directly
             pdf_display = f"""
-            <iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>
+            <iframe src="{file_url}" width="700" height="1000" type="application/pdf"></iframe>
             """
-            st.markdown(pdf_display, unsafe_allow_html=True)
+            components.html(pdf_display, height=1000)
 
             program_name = selected_file.split(".")[0]
             if program_name in st.session_state["user_sessions"]["name"].unique():
