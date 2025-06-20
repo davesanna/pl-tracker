@@ -121,7 +121,7 @@ else:
             index=None,
         )
 
-        if selected_file:
+        if selected_file_comp:
             file_url = st.session_state["supabase_client"].get_bucket_signed_url(
                 "programs", selected_file_comp
             )
