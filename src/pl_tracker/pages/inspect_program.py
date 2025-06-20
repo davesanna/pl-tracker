@@ -132,6 +132,14 @@ else:
 
             pdf_viewer(response.content)
 
+            viewer_url = (
+                f"https://mozilla.github.io/pdf.js/web/viewer.html?file={file_url}"
+            )
+            components.html(
+                f'<iframe src="{viewer_url}" width="100%" height="1000px"></iframe>',
+                height=1000,
+            )
+
             program_name_comp = selected_file_comp.split(".")[0]
             if program_name_comp in st.session_state["user_sessions"]["name"].unique():
                 plot_type_comp = st.selectbox(
