@@ -87,7 +87,7 @@ else:
             response.raise_for_status()
 
             # base64_pdf = base64.b64encode(response.content).decode("utf-8")
-            pdf_viewer(response.content)
+            pdf_viewer(response.content, height=1400)
 
             program_name = selected_file.split(".")[0]
             if program_name in st.session_state["user_sessions"]["name"].unique():
@@ -130,7 +130,7 @@ else:
 
             # base64_pdf = base64.b64encode(response.content).decode("utf-8")
 
-            pdf_viewer(response.content)
+            pdf_viewer(response.content, height=1400)
 
             program_name_comp = selected_file_comp.split(".")[0]
             if program_name_comp in st.session_state["user_sessions"]["name"].unique():
