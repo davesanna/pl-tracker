@@ -86,11 +86,16 @@ else:
             response.raise_for_status()
 
             base64_pdf = base64.b64encode(response.content).decode("utf-8")
+            # method 1
+            pdf_url = file_url
+            pdf_display = f'<iframe src="{pdf_url}" width="700" height="700" type="application/pdf"></iframe>'
+            st.markdown(pdf_display, unsafe_allow_html=True)
 
+            # method 2
             st.markdown(
                 f"""
-                <embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">
-                """,
+            <embed src="{file_url}" width="800" height="800">
+            """,
                 unsafe_allow_html=True,
             )
 
