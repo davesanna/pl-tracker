@@ -36,9 +36,9 @@ def compute_sets_per_week(
     """
     import streamlit as st
 
-    if program.endswith(".pdf"):
-        program = program.split(".")[0]
     if program:
+        if program.endswith(".pdf"):
+            program = program.split(".")[0]
         user_sessions = user_sessions.query(f"name == '{program}'")
 
     if exercise != "All":
