@@ -7,6 +7,7 @@ import requests
 from src.pl_tracker.database import SupabaseClient
 from src.pl_tracker.plots import plot_1rm_progress, plot_sets_per_week
 import streamlit.components.v1 as components
+from streamlit_pdf_viewer import pdf_viewer
 
 
 st.header("Programs")
@@ -85,19 +86,8 @@ else:
             response = requests.get(file_url)
             response.raise_for_status()
 
-            base64_pdf = base64.b64encode(response.content).decode("utf-8")
-            # method 1
-            pdf_url = file_url
-            pdf_display = f'<iframe src="{pdf_url}" width="700" height="700" type="application/pdf"></iframe>'
-            st.markdown(pdf_display, unsafe_allow_html=True)
-
-            # method 2
-            st.markdown(
-                f"""
-            <embed src="{file_url}" width="800" height="800">
-            """,
-                unsafe_allow_html=True,
-            )
+            # base64_pdf = base64.b64encode(response.content).decode("utf-8")
+            pdf_viewer(response.content)
 
             program_name = selected_file.split(".")[0]
             if program_name in st.session_state["user_sessions"]["name"].unique():
@@ -138,12 +128,9 @@ else:
             response = requests.get(file_url)
             response.raise_for_status()
 
-            base64_pdf = base64.b64encode(response.content).decode("utf-8")
+            # base64_pdf = base64.b64encode(response.content).decode("utf-8")
 
-            pdf_display = f"""
-            <iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>
-            """
-            st.markdown(pdf_display, unsafe_allow_html=True)
+            pdf_viewer(response.content)
 
             program_name_comp = selected_file_comp.split(".")[0]
             if program_name_comp in st.session_state["user_sessions"]["name"].unique():
