@@ -3,7 +3,7 @@ import streamlit as st
 
 def common_nav():
 
-    columns = st.columns([4, 1, 1, 1, 1, 1, 1], vertical_alignment="center")
+    columns = st.columns([5, 1, 1, 1, 1, 1, 1], vertical_alignment="center")
 
     with columns[0]:
         st.title(f"✨ Hello {st.user.get("name", "username")}!")
