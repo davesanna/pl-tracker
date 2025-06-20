@@ -87,11 +87,12 @@ else:
 
             base64_pdf = base64.b64encode(response.content).decode("utf-8")
 
-            # Embed the signed URL directly
-            pdf_display = f"""
-            <iframe src="{file_url}" width="700" height="1000" type="application/pdf"></iframe>
-            """
-            components.html(pdf_display, height=1000)
+            st.markdown(
+                f"""
+                <embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">
+                """,
+                unsafe_allow_html=True,
+            )
 
             program_name = selected_file.split(".")[0]
             if program_name in st.session_state["user_sessions"]["name"].unique():
