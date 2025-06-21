@@ -10,25 +10,6 @@ class SupabaseClient:
     def __init__(self, url: str, api_key: str):
         self.client = create_client(url, api_key)
 
-    def upload_video_and_meta(self, file, meta: SessionMetadata, user):
-        video_id = str(uuid4())
-        remote_path = f"{user['sub']}/{video_id}-{file.name}"
-        self.client.storage.from_("videos").upload(remote_path, file)
-        url = self.client.storage.from_("videos").get_public_url(remote_path)[
-            "publicURL"
-        ]
-        # insert into videos
-        self.client.table("videos").insert(
-            {
-                "id": video_id,
-                "user_id": user["sub"],
-                "url": url,
-                **meta.dict(),
-                "uploaded_at": datetime.utcnow(),
-            }
-        ).execute()
-        st.success("📹 Video uploaded!")
-
     def upload_nutrition_data(self, nutrition_data: pd.DataFrame, user_id: str):
         """
         Upload nutrition data to the database.
@@ -151,3 +132,64 @@ class SupabaseClient:
         )["signedURL"]
 
         return video_url
+
+    def update_video_meta(self, video_id: str, meta: SessionMetadata):
+        """
+        Update video metadata in the database.
+
+        Args:
+            video_id (str): The ID of the video to update.
+            meta (SessionMetadata): The metadata to update.
+
+        Returns:
+            None
+        """
+        self.client.table("videos").update(meta.dict()).eq("id", video_id).execute()
+        st.success("📹 Video metadata updated!")
+
+    def upload_video_and_meta(self, user_id, file, meta: SessionMetadata):
+        video_id = str(uuid4())
+        remote_path = f"{user_id}/{meta["program"]}/Week {meta["week"]}/Day {meta["day"]}/{meta["exercise"]}/{meta["video_name"]}"
+
+        file_content = file.getvalue()
+        self.client.storage.from_("videos").upload(remote_path, file_content)
+        # url = self.client.storage.from_("videos").get_public_url(remote_path)[
+        #     "publicURL"
+        # ]
+        # insert into videos
+        self.client.table("videos").insert(
+            {
+                "id": video_id,
+                "user_id": user_id,
+                # "url": url,
+                **meta,
+            }
+        ).execute()
+
+        st.dataframe(st.session_state["videos_data"])
+
+        st.session_state["videos_data"] = pd.concat(
+            [
+                st.session_state["videos_data"],
+                pd.DataFrame(
+                    [
+                        {
+                            "id": video_id,
+                            "user_id": user_id,
+                            "video_name": meta["video_name"],
+                            "program": meta["program"],
+                            "week": meta["week"],
+                            "day": meta["day"],
+                            "exercise": meta["exercise"],
+                            "Sets": meta["Sets"],
+                            "Reps": meta["Reps"],
+                            "Effective Set": meta["Effective Set"],
+                            "Weight": meta["Weight"],
+                            "notes": meta["notes"],
+                        }
+                    ]
+                ),
+            ],
+            ignore_index=True,
+        )
+        st.success("📹 Video uploaded!")
