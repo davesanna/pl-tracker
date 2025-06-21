@@ -13,6 +13,8 @@ with col1:
 with col2:
     video_comparator(key_suffix="video_comparator_2")
 
+
+st.subheader("Upload Video")
 uploaded_video = st.file_uploader(
     "Upload your video here",
     type=["mp4", "mov", "avi"],
