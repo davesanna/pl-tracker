@@ -43,6 +43,11 @@ load_program = st.Page(
     title="Load Program",
     icon=":material/upload_file:",
 )
+video_page = st.Page(
+    "./src/pl_tracker/pages/video.py",
+    title="Video Analysis",
+    icon=":material/insights:",
+)
 
 if not st.user.is_logged_in:
     pg = st.navigation(
@@ -53,13 +58,20 @@ elif st.user.email == os.environ.get("ADMIN_EMAIL", None):
     cache_user_data()
     common_nav()
     pg = st.navigation(
-        [general_progress, nutrition, inspect_program, load_program, admin_page],
+        [
+            general_progress,
+            nutrition,
+            inspect_program,
+            load_program,
+            video_page,
+            admin_page,
+        ],
     )
 else:
     cache_user_data()
     common_nav()
     pg = st.navigation(
-        [general_progress, nutrition, inspect_program, load_program],
+        [general_progress, nutrition, inspect_program, load_program, video_page],
     )
 
 pg.run()

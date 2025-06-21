@@ -46,11 +46,14 @@ def common_nav():
             )
 
 
-def video_comparator(key_suffix=None):
+def video_comparator(user_id, key_suffix=None):
+    user_sessions = st.session_state["user_sessions"].query(f"user_id == '{user_id}'")
+    user_videos = st.session_state["videos_data"].query(f"user_id == '{user_id}'")
+
     program_selector = st.selectbox(
         "Select a Program",
-        options=st.session_state["user_sessions"]["name"].unique().tolist(),
-        index=0,
+        options=user_videos["program"].unique().tolist(),
+        index=None,
         key=f"program_selector_{key_suffix}" if key_suffix else "program_selector",
         help="Select a program to view the videos associated with it.",
     )
@@ -58,50 +61,59 @@ def video_comparator(key_suffix=None):
     if program_selector:
         week_selector = st.selectbox(
             "Select a Week",
-            options=st.session_state["user_sessions"]
-            .query(f"name == '{program_selector}'")["Week"]
+            options=user_videos.query(f"program == '{program_selector}'")["week"]
             .unique()
             .tolist(),
-            index=0,
+            index=None,
             key=f"week_selector_{key_suffix}" if key_suffix else "week_selector",
             help="Select a week to view the videos associated with it.",
         )
+
         if week_selector:
             day_selector = st.selectbox(
                 "Select a Day",
-                options=st.session_state["user_sessions"]
-                .query(f"name == '{program_selector}' and Week == {week_selector}")[
-                    "Day"
-                ]
+                options=user_videos.query(
+                    f"program == '{program_selector}' and week == {int(week_selector)}"
+                )["day"]
                 .unique()
                 .tolist(),
-                index=0,
+                index=None,
                 key=f"day_selector_{key_suffix}" if key_suffix else "day_selector",
                 help="Select a day to view the videos associated with it.",
             )
 
-            # if day_selector:
-            #     video_selector = st.selectbox(
-            #         "Select a Video",
-            #         options=st.session_state["videos"]
-            #         .query(
-            #             f"name == '{program_selector}' and week == {week_selector} and day == {day_selector}"
-            #         )["video"]
-            #         .unique()
-            #         .tolist(),
-            #         index=0,
-            #         key=(
-            #             "video_selector_{key_suffix}"
-            #             if key_suffix
-            #             else "video_selector"
-            #         ),
-            #         help="Select a video to view.",
-            #     )
-            #     if video_selector:
-            #         video_url = st.session_state[
-            #             "supabase_client"
-            #         ].get_bucket_signed_url(
-            #             "videos",
-            #             f"{program_selector}/{week_selector}/{day_selector}/{video_selector}",
-            #         )
-            #         st.video(video_url)
+            if day_selector:
+                exercise_selector = st.selectbox(
+                    "Select an Exercise",
+                    options=user_videos.query(
+                        f"program == '{program_selector}' and week == {week_selector} and day == {day_selector}"
+                    )["exercise"]
+                    .unique()
+                    .tolist(),
+                    index=None,
+                    key=(
+                        f"exercise_selector_{key_suffix}"
+                        if key_suffix
+                        else "exercise_selector"
+                    ),
+                    help="Select an exercise to view the videos associated with it.",
+                )
+                if exercise_selector:
+                    video_selector = st.selectbox(
+                        "Select a Video",
+                        options=user_videos.query(
+                            f"program == '{program_selector}' and week == {week_selector} and day == {day_selector}"
+                        )["video_name"],
+                        key=(
+                            f"video_selector_{key_suffix}"
+                            if key_suffix
+                            else "video_selector"
+                        ),
+                        help="Select a video to view.",
+                    )
+                    if video_selector:
+                        video_url = st.session_state["supabase_client"].get_user_video(
+                            st.session_state["selected_user_id"],
+                            f"{program_selector}/Week {week_selector}/Day {day_selector}/{exercise_selector}/{video_selector}",
+                        )
+                        st.video(video_url)

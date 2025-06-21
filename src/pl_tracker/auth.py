@@ -18,7 +18,7 @@ def cache_user_data():
         user_id = fetch_user(st.user["email"])
 
         if "user_sessions" not in st.session_state:
-            user_sessions, nutrition_data = fetch_user_data(user_id)
+            user_sessions, nutrition_data, videos_data = fetch_user_data(user_id)
             rpe_table = fetch_rpe_table()
             st.session_state["user_sessions"] = pd.merge(
                 user_sessions,
@@ -29,6 +29,7 @@ def cache_user_data():
             )
 
             st.session_state["nutrition_data"] = nutrition_data
+            st.session_state["videos_data"] = videos_data
 
 
 def fetch_user(email):
@@ -88,7 +89,7 @@ def fetch_user_data(user_id):
     user_sessions = (
         pd.merge(
             user_sessions,
-            pd.DataFrame(user_programs)[["id", "name", "date"]],
+            pd.DataFrame(user_programs)[["id", "name", "date", "user_id"]],
             left_on="program_id",
             right_on="id",
             suffixes=("", "_program"),
@@ -103,7 +104,16 @@ def fetch_user_data(user_id):
         user_sessions["name"] + " - Week " + user_sessions["Week"].astype(str)
     )
 
-    return user_sessions, nutrition_data
+    videos_data = pd.DataFrame(
+        st.session_state["supabase_client"]
+        .client.table("videos")
+        .select("*")
+        .in_("user_id", user_id)
+        .execute()
+        .data
+    )
+
+    return user_sessions, nutrition_data, videos_data
 
 
 def fetch_rpe_table():
@@ -154,5 +164,7 @@ def fetch_and_preprocess_nutrition_data(
 
     for column in ["Protein (%)", "Carbs (%)", "Fat (%)"]:
         nutrition_data[column] /= nutrition_data["Total Macronutrients (%)"]
+
+    nutrition_data = nutrition_data.round(2)
 
     return nutrition_data

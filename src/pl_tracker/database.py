@@ -135,3 +135,19 @@ class SupabaseClient:
         file_content = file.getvalue()
         self.client.storage.from_("programs").upload(remote_path, file_content)
         st.success("📄 Program file uploaded!")
+
+    def get_user_video(self, user_id: str, path: str):
+        """
+        Fetch video metadata for a specific user.
+
+        Args:
+            user_id (str): The user ID to fetch videos for.
+
+        Returns:
+            pd.DataFrame: DataFrame containing video metadata.
+        """
+        video_url = self.client.storage.from_("videos").create_signed_url(
+            user_id + "/" + path, 60 * 60
+        )["signedURL"]
+
+        return video_url
