@@ -116,4 +116,33 @@ def video_comparator(user_id, key_suffix=None):
                             st.session_state["selected_user_id"],
                             f"{program_selector}/Week {week_selector}/Day {day_selector}/{exercise_selector}/{video_selector}",
                         )
-                        st.video(video_url)
+
+                        width = st.slider(
+                            label="Width",
+                            min_value=0,
+                            max_value=100,
+                            value=70,
+                            format="%d%%",
+                            key=(
+                                f"video_width_{key_suffix}"
+                                if key_suffix
+                                else "video_width"
+                            ),
+                        )
+
+                        width = max(width, 0.01)
+                        side = max((100 - width) / 2, 0.01)
+
+                        _, container, _ = st.columns([side, width, side])
+                        container.video(data=video_url)
+
+                        st.markdown("### Video Metadata")
+                        st.json(
+                            user_videos.query(
+                                f"program == '{program_selector}' and week == {week_selector} and day == {day_selector} and exercise == '{exercise_selector}'"
+                            )[["Sets", "Reps", "Effective Set", "Weight"]].to_dict(
+                                orient="records"
+                            )[
+                                0
+                            ],
+                        )
