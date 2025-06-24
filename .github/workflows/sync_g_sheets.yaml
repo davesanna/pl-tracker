@@ -2,7 +2,7 @@ name: Sync Google Sheet to Supabase
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '15 21 * * *'
   workflow_dispatch:
 
 jobs:
