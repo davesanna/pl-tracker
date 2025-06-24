@@ -2,7 +2,7 @@ name: Sync Google Sheet to Supabase
 
 on:
   schedule:
-    - cron: '0 19 * * *'
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,6 @@ jobs:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
-
 
     steps:
       - uses: actions/checkout@v4
