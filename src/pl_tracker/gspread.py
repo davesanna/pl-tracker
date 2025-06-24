@@ -1,5 +1,7 @@
+import json
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow, Flow
 import pandas as pd
 import gspread
@@ -7,6 +9,9 @@ import os
 from google.auth import default
 
 from pathlib import Path
+from googleapiclient.discovery import build
+
+load_dotenv()
 
 
 class GSpreadClient:
@@ -25,49 +30,31 @@ class GSpreadClient:
 
     def google_authenticate(self):
         """Authenticate with Google Sheets API and create a service object."""
-        base_dir = Path(__file__).resolve().parents[2]
-        token_path = os.path.join(base_dir, "token.json")
-        credentials_path = os.path.join(base_dir, "credentials.json")
+        # base_dir = Path(__file__).resolve().parents[2]
+        # token_path = os.path.join(base_dir, "token.json")
+        # credentials_path = os.path.join(base_dir, "credentials.json")
 
-        if os.path.exists(token_path):
-            self.creds = Credentials.from_authorized_user_file(token_path, self.scopes)
-        # If there are no (valid) credentials available, let the user log in.
-        if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    credentials_path, self.scopes
-                )
-                creds = flow.run_local_server(port=0)
+        # if os.path.exists(token_path):
+        #     self.creds = Credentials.from_authorized_user_file(token_path, self.scopes)
+        # # If there are no (valid) credentials available, let the user log in.
+        # if not self.creds or not self.creds.valid:
+        #     if self.creds and self.creds.expired and self.creds.refresh_token:
+        #         self.creds.refresh(Request())
+        #     else:
+        #         flow = InstalledAppFlow.from_client_secrets_file(
+        #             credentials_path, self.scopes
+        #         )
+        #         creds = flow.run_local_server(port=0)
 
         # with open("token.json", "w") as token:
         #     token.write(creds.to_json())
 
-        # flow = Flow.from_client_config(
-        #     {
-        #         "web": {
-        #             "client_id": os.environ["GOOGLE_CLIENT_ID"],
-        #             "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
-        #             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        #             "token_uri": "https://oauth2.googleapis.com/token",
-        #             "redirect_uris": ["http://localhost:8501/oauth2callback"],
-        #         }
-        #     },
-        #     scopes=self.scopes,
-        #     redirect_uri="http://localhost:8501/oauth2callback",
-        # )
-        # authorization_url, state = flow.authorization_url(
-        #     # Enable offline access so that you can refresh an access token without
-        #     # re-prompting the user for permission. Recommended for web server apps.
-        #     access_type="offline",
-        #     # Enable incremental authorization. Recommended as a best practice.
-        #     include_granted_scopes="true",
-        # )
+        json_data = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
+        if not json_data:
+            raise RuntimeError("Missing GOOGLE_SERVICE_ACCOUNT_JSON in environment")
 
-        # return authorization_url, state
-
-        # self.creds, _ = default(scopes=self.scopes)
+        info = json.loads(json_data)
+        self.creds = Credentials.from_service_account_info(info, scopes=self.scopes)
 
     def _get_gspread_client(self):
         """Get a gspread client using the authenticated credentials."""

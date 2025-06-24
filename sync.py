@@ -86,7 +86,11 @@ def sync_existing_programs():
 
             changed = df_merged[changed_mask]
 
-            if not changed.empty:
+            if changed.empty:
+                print(f"No changes found for {program}, skipping.")
+                continue
+            else:
+
                 print(f"Found {len(changed)} changed records for {program}.")
 
                 for _, row in changed.iterrows():
@@ -100,8 +104,8 @@ def sync_existing_programs():
                         .execute()
                     )
 
-                    print(response)
-                print(f"Successfully synced {len(changed)} records for {program}.")
+                print(response)
+            print(f"Successfully synced {len(changed)} records for {program}.")
 
 
 def clean_worksheet(worksheet_df, program_id):
@@ -177,8 +181,9 @@ def sync_new_spreadsheets_to_database(spreadsheet_name="PL Programs"):
             print(f"Processing {worksheet_name}...")
             if f"{worksheet_name}" in available_programs:
                 print(
-                    "Program {worksheet_name} already exists in the database, skipping."
+                    f"Program {worksheet_name} already exists in the database, skipping."
                 )
+                continue
 
             program_id = str(uuid4())
             worksheet = get_spreadsheet_data(spreadsheet_name, f"{worksheet_name}")
@@ -212,6 +217,7 @@ if __name__ == "__main__":
     print("Syncing existing programs from Google Spreadsheet to Supabase...")
 
     sync_existing_programs()
+
     print("Sync existing programs completed.")
 
     print("Syncing new programs from Google Spreadsheet to Supabase...")
