@@ -91,7 +91,8 @@ def get_last_7d_avg_calories_target(
     nutrition_data["Date"] = pd.to_datetime(nutrition_data["Date"])
     user_nutrition = nutrition_data.query(f"user_id == '{user_id}'")
     last_7d_avg_caloric_target = (
-        user_nutrition.sort_values(by="Date", ascending=False)
+        user_nutrition.query("`Target Calories (kcal)` > 0")
+        .sort_values(by="Date", ascending=False)
         .head(7)[["Target Calories (kcal)"]]
         .reset_index(drop=True)
         .mean()
